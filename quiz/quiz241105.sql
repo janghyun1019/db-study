@@ -22,7 +22,7 @@ SELECT
 FROM professor
 WHERE deptno IN (101, 102, 103, 201) AND bonus is null;
 
--2.학생들의 이름, 아이디, 주민번호를 아래와 같은 형태로 정리해서 보여주시오.
+--2.학생들의 이름, 아이디, 주민번호를 아래와 같은 형태로 정리해서 보여주시오.
 
 SELECT 
     '이름:' || name as "이름",
