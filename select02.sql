@@ -224,6 +224,154 @@ FROM dual;
 SELECT
     SYSDATE,
     TO_CHAR(SYSDATE, 'YYYY-MM-DD HH:MI:SS'),
-    TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') --1~24까지 뜨게하는 방법
+    TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS'), --1~24까지 뜨게하는 방법
+    TO_CHAR(SYSDATE, 'HH24:MI:SS'),
+    TO_CHAR(ROUND(SYSDATE), 'YYYY-MM-DD HH:MI:SS')
 FROM dual;
 
+SELECT
+    TO_CHAR(1234,'999999'), --'9999999'의 자릿수 만큼 채워진다
+    TO_CHAR(1234,'099999'),
+    TO_CHAR(1234,'$99999'),
+    '$' || 1234,
+    TO_CHAR(1234,'99999.99'),
+    TO_CHAR(12345,'99,999')
+FROM dual;
+
+
+--문자 -< 날짜 TO_DATE
+SELECT
+    TO_DATE('2024-06-02') + 3,
+    TO_DATE('2024/06/02') + 3,
+    TO_DATE('24/06/02') + 3,
+    TO_DATE('20240602') + 3,
+    LAST_DAY('2024-08-05'),   -- 달의 마지막날을 알려줌
+    TO_DATE('24:06:02') + 3,
+    TO_CHAR(SYSDATE, 'YYYY/MM/DD'),
+    TO_DATE('2024-01-05', 'YYYY/MM/DD'),
+    TO_DATE('2024,01,05', 'YYYY,MM,DD'),
+    TO_DATE('12/10/20', 'MM/DD/YY')         --12년 10월 20일 -> 12월 10일 20년도
+FROM dual;
+
+/*
+1) NVL( ) 함수 : NULL 값을 만나면 다른 값으로 치환해서 출력하는 함수
+- 문 법: NVL(컬럼 , 치환할 값)
+* 치환값이 숫자일 경우
+NVL(sal , 0) -> sal 컬럼의 값이 null 일 경우 null 대신 0 으로 치환하라
+NVL(sal , 100) -> sal 컬럼의 값이 null 일 경우 null 대신 100 으로 치환하라
+*/
+
+SELECT
+    sal,
+    comm,
+    sal*12 + comm,             --숫자*12 + null
+    sal*12 + NVL(comm, 0)
+FROM emp;
+
+--캡쳐 6 넣기
+
+
+SELECT *
+FROM professor;
+
+
+
+SELECT
+    profno,
+    name,
+    pay,
+    bonus,
+    TO_CHAR((pay *12) + NVL(bonus, 0), '999,999') "TOTAL"
+FROM professor
+WHERE deptno = 201;
+
+
+/*
+NVL2( ) 함수
+- 문 법: NVL2( COL1 , COL2 , COL3 )
+예) emp 테이블에서 deptno 가 30번 인 사람들의 empno , ename , sal , comm
+값을 출력하되 만약 comm 값이 null 이 아니면 sal+comm 값을 출력하고 comm
+값이 null 이면 sal*0 의 값을 출력하세요.
+*/
+
+SELECT
+    empno,
+    ename,
+    sal,
+    comm,
+    --만약 comm 값이 null 이 아니면 sal+comm 값을 출력하고 comm값이 null 이면 sal*0 의 값을 출력
+    NVL2(comm, sal+comm, sal *0) "NVL2"  
+FROM emp
+WHERE deptno = 30;
+
+/*
+3) DECODE( ) 함수 (아주 중요합니다 !!)
+DECODE 함수는 일반 개발 언어 등에서 사용중인 분기문인 IF 문을 오라클 SQL
+안으로 가져온 함수입니다. DECODE 함수는 오라클에서만 사용되는 함수로 IF 문을
+사용해야 하는 조건 문을 처리할 수 있습니다. 오라클에서만 사용되는 함수라서 별
+로 중요하지 않다는 의미가 아니라 오라클에서는 거의 사용되는 아주 중요한 함수
+이므로 잘 습득하셔야만 합니다.
+유형 1. A 가 B 일 경우 ‘1’ 을 출력하는 경우
+- DECODE (A, B, ‘1’, null) (단 마지막 null은 생략 가능 합니다)
+*/
+
+--삼항연산자처럼 쓴다 중첩사용 한다
+SELECT
+    DECODE(10, 10, '같다', '다르다'),
+    DECODE(10, 20, '같다', '다르다'),
+    DECODE(10, 20, '같다'),
+    DECODE(10, 20, '같다', 'null'),
+    DECODE(50, 30, '30이다', 40, '40이다', 50, '50이다', '아니다'),
+    DECODE(10, 30, '30이다', 40, '40이다', 50, '50이다', 60, '60이다', '아니다'),
+    DECODE(10, 30, '30이다', 40, '40이다', 50, '50이다', 60, '60이다', null),
+    DECODE(40, 30, '30이다', 40, '40이다', 50, '50이다', 60, '60이다')
+FROM dual;
+
+SELECT
+    deptno,
+    name,
+    DECODE(deptno, 101, '컴퓨터공학', '다른학과'),
+    DECODE(deptno, 101, '컴퓨터공학', 'ETC'),
+    DECODE(deptno, 101, '컴퓨터공학'),
+    DECODE(deptno, 101, '컴퓨터공학', 'null')
+FROM professor;
+
+SELECT
+    deptno,
+    name,
+    DECODE(deptno, 101, '컴퓨터공학' , 102, '멀티미디어', 103, '소프트웨어', 'ETC') "DNAME",
+    deptno
+FROM professor;
+
+-- 삼항연산자 -> 조건? 참:거짓
+/*
+CASE 문
+문 법 : CASE 조건 WHEN 결과1 THEN 출력1
+                [WHEN 결과2 THEN 출력2]
+                ELSE 출력3
+        END “컬럼명”
+*/
+
+--grade 학년
+--1 1학년 2 2학년 3 3학년 4 4학년
+SELECT grade || '학년'
+FROM student;
+
+
+
+--1 저학년 2 저학년 3 고학년 4 고학년
+SELECT 
+    grade,
+    DECODE(grade, 1, '저학년', 2, '저학년', 3, '고학년', 4, '고학년') 구분,
+    CASE grade
+        WHEN 1 THEN '저학년'
+        --특정조건이 맞으면 뒤에 것을 하겠다
+        WHEN 2 THEN '저학년'
+        WHEN 3 THEN '고학년'
+        WHEN 4 THEN '고학년'
+    END AS "학년구분",
+    CASE
+        WHEN grade IN (1,2) THEN '저학년'
+        WHEN grade BETWEEN 3 AND 4 THEN '고학년'
+    END 학년구분
+FROM student;
