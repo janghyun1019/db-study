@@ -173,6 +173,28 @@ WHERE p.profno = s.profno(+) --교수테이블을 기준으로 학생정보를 �
 --WHERE s.profno(+) = p.profno
 ;
 
+SELECT *
+FROM student
+;
 
+SELECT *
+FROM professor
+;
+
+SELECT *
+FROM emp
+;
+
+--내사번, 내이름, 내 상사의 사번, 상사의 이름
+-- 똑같은 테이블을 두고 비교하며 조인한다
+SELECT 
+    e1.empno
+    ,e1.ename
+    ,e1.mgr
+    ,e2.empno
+    ,e2.ename
+FROM emp e1, emp e2
+WHERE e1.mgr = e2.empno
+;
 
 
