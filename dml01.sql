@@ -37,6 +37,28 @@ VALUES(65, '이름6');
 INSERT INTO new_table
 VALUES(7, '이름7', null);
 
+-- 여러개 동시에 삽입(저장) INSERT ALL
+SELECT * FROM tt02;
+
+INSERT ALL
+INTO tt02 VALUES (7, '이름7', null)
+INTO tt02 VALUES (8, '이름8', null)
+INTO tt02 VALUES (9, '이름9', null)
+INTO tt02 VALUES (10, '이름10', null)
+SELECT * FROM dual;
+
+INSERT INTO tt02 --number3 varchar2 date
+SELECT 11, '샘플', SYSDATE FROM dual;
+
+
+-- 여러개를 삽입할수 있다
+INSERT INTO tt02 --tt02 테이블 전부 dept로 삽입 
+SELECT deptno, loc, SYSDATE FROM dept;
+
+
+
+
+
 --날짜 입력할땐 TO_DATE('2002-02-15') 이런형식으로 해야함
 
 ----
